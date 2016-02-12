@@ -49,28 +49,64 @@ class NYSIIS
             );
         }
         $name = $this->normalizeName($name);
+        
         $name = $this->translateFirstCharacters($name);
         $name = $this->translateLastCharacters($name);
-        $key = mb_substr($name, 0, 1);
-        $name = mb_substr($name, 1);
 
-        for ($pos = 0; $pos <= mb_strlen($name); $pos++) {
-            $name = $this->translateVowels($name, $pos);
-            $name = $this->translateSuperficialLetters($name, $pos);
-            $name = $this->translateKay($name, $pos);
-            $name = $this->translateHomophones($name, $pos);
-            $h_name = $this->translateAitch($name, $pos);
-            $h_delete = false;
-            if ($h_name != $name) {
-                $h_delete = true;
-                $name = $h_name;
+        $key = mb_substr($name, 0, 1);
+        for ($key_pointer = 1; $key_pointer <= mb_strlen($name); $key_pointer++) {
+            $key_1n = mb_substr($name, $key_pointer-1, 1);
+            $key_n = mb_substr($name, $key_pointer, 1);
+            $key_n1 = mb_substr($name, $key_pointer+1, 1);
+            $key_n2 = mb_substr($name, $key_pointer+2, 1);
+            
+            if ($this->translateVowels(
+                    $name,
+                    $key_n,
+                    $key_n1,
+                    $key_pointer
+                )
+            ) {
+            } elseif ($this->translateSuperficialLetters(
+                    $name,
+                    $key_n,
+                    $key_pointer
+                )
+            ) {
+            } elseif ($this->translateKay(
+                    $name,
+                    $key_n,
+                    $key_n1,
+                    $key_pointer
+                )
+            ) {
+            } elseif ($this->translateHomophones(
+                $name,
+                $key_n,
+                $key_n1,
+                $key_n2,
+                $key_pointer
+                )
+            ) {
+            } elseif ($this->translateAitch(
+                $name,
+                $key_1n,
+                $key_n,
+                $key_n1,
+                $key_pointer
+                )
+            ) {
+            } elseif ($this->translateDoubleU(
+                $name,
+                $key_1n,
+                $key_n,
+                $key_pointer
+                )
+            ) {
             }
-            $name = $this->translateDoubleU($name, $pos);
-            if (!$h_delete && mb_substr($key, -1) != mb_substr($name, $pos, 1)) {
-                $key .= mb_substr($name, $pos, 1);
-            }
-            if ($h_delete) {
-                $pos -= 1;
+            $new_key_n = mb_substr($name, $key_pointer, 1);
+            if ($key_1n != $new_key_n) {
+                $key .= $new_key_n;
             }
         }
         
@@ -163,216 +199,164 @@ class NYSIIS
     /**
      * Translates any vowels as the passed position
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_n The character at the current pointer
+     * @param string $key_n1 The character after the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateVowels($name, $pos)
-    {
-        $translated_name = $this->replaceAt($name, 'EV', 'AF', $pos);
+    protected function translateVowels(
+        &$name,
+        $key_n,
+        $key_n1,
+        $key_pointer
+    ) {
+        if ($key_n.$key_n1 == 'EV') {
+            $name = $this->replaceAt($name, 'EV', 'AF', $key_pointer);
+            return true;
+        }
         
-        $vowel_translate = array(
-            "E",
-            "I",
-            "O",
-            "U",
-            "À",
-            "È",
-            "Ì",
-            "Ò",
-            "Ù",
-            "Ȁ",
-            "Ȅ",
-            "Ȉ",
-            "Ȍ",
-            "Ȕ",
-            "Á",
-            "É",
-            "Í",
-            "Ó",
-            "Ú",
-            "Ý",
-            "Ő",
-            "Ű",
-            "Â",
-            "Ê",
-            "Î",
-            "Ô",
-            "Û",
-            "Ä",
-            "Ë",
-            "Ï",
-            "Ö",
-            "Ü",
-            "Ã",
-            "Ẽ",
-            "Ĩ",
-            "Õ",
-            "Ũ",
-            "Ą",
-            "Ę",
-            "Į",
-            "Ǫ",
-            "Ų",
-            "Ā",
-            "Ē",
-            "Ī",
-            "Ō",
-            "Ū",
-            "Ă",
-            "Ĕ",
-            "Ĭ",
-            "Ŏ",
-            "Ŭ",
-            "Ǎ",
-            "Ě",
-            "Ǐ",
-            "Ǒ",
-            "Ǔ",
-            "Ȧ",
-            "Ė",
-            "Ȯ",
-            "Ạ",
-            "Ẹ",
-            "Ị",
-            "Ọ",
-            "Ụ",
-            "Ḛ",
-            "Ḭ",
-            "Ṵ",
-            "Ṳ",
-        );
-        $translated_name = $name;
-        foreach ($vowel_translate as $from) {
-            $translated_name = $this->replaceAt($name, $from, 'A', $pos);
-            if ($name !== $translated_name) {
-                break;
+        foreach ($this->getVowels() as $from) {
+            if ($key_n == $from) {
+                $name = $this->replaceAt($name, $from, 'A', $key_pointer);
+                return true;
             }
         }
-        return $translated_name;
+        return false;
     }
 
     /**
      * Translates letters that have a similar appearance
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_n The character at the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateSuperficialLetters($name, $pos)
-    {
+    protected function translateSuperficialLetters(
+        &$name,
+        $key_n,
+        $key_pointer
+    ) {
         $super_translate = array(
             "Q" => "G",
             "Z" => "S",
             "M" => "N",
         );
-        $translated_name = $name;
         foreach ($super_translate as $from => $to) {
-            $translated_name = $this->replaceAt($name, $from, $to, $pos);
-            if ($name !== $translated_name) {
-                break;
+            if ($key_n == $from) {
+                $name = $this->replaceAt($name, $from, $to, $key_pointer);
+                return true;
             }
         }
-        return $translated_name;
+        return false;
     }
 
     /**
      * Translates the letter K
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_n The character at the current pointer
+     * @param string $key_n1 The character after the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateKay($name, $pos)
-    {
-        $super_translate = array(
-            "KN" => "N",
-            "K" => "C",
-        );
-        $translated_name = $name;
-        foreach ($super_translate as $from => $to) {
-            $translated_name = $this->replaceAt($name, $from, $to, $pos);
-            if ($name !== $translated_name) {
-                break;
+    protected function translateKay(
+        &$name,
+        $key_n,
+        $key_n1,
+        $key_pointer
+    ) {
+        if ($key_n == 'K') {
+            if ($key_n1 == 'N') {
+                $name = $this->replaceAt($name, 'KN', 'N', $key_pointer);
+            } else {
+                $name = $this->replaceAt($name, 'K', 'C', $key_pointer);
             }
+            return true;
         }
-        return $translated_name;
+        return false;
     }
 
     /**
      * Translates similar sounding letters
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_n The character at the current pointer
+     * @param string $key_n1 The character after the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateHomophones($name, $pos)
-    {
-        $phone_translate = array(
-            "SCH" => "SSS",
-            "PH" => "FF",
-        );
-        $translated_name = $name;
-        foreach ($phone_translate as $from => $to) {
-            $translated_name = $this->replaceAt($name, $from, $to, $pos);
-            if ($name !== $translated_name) {
-                break;
-            }
+    protected function translateHomophones(
+        &$name,
+        $key_n,
+        $key_n1,
+        $key_n2,
+        $key_pointer
+    ) {
+        if ($key_n.$key_n1.$key_n2 == 'SCH') {
+            $name = $this->replaceAt($name, 'SCH', 'SSS', $key_pointer);
+            return true;
         }
-        return $translated_name;
+        if ($key_n.$key_n1== 'PH') {
+            $name = $this->replaceAt($name, 'PH', 'FF', $key_pointer);
+            return true;
+        }
+        return false;
     }
 
     /**
      * Translates the letter H
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_1n The character before the current pointer
+     * @param string $key_n The character at the current pointer
+     * @param string $key_n1 The character after the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateAitch($name, $pos)
-    {
-        if (mb_strpos($name, 'H') !== $pos) {
-            return $name;
+    protected function translateAitch(
+        &$name,
+        $key_1n,
+        $key_n,
+        $key_n1,
+        $key_pointer
+    ) {
+        if ($key_n !== 'H') {
+            return false;
         }
-        $translated_name = $name;
-        $vowels = array('A','E','I','O','U');
-        if ((
-                $pos-1 < 0 ||
-                !in_array(mb_substr($name, $pos-1, 1), $vowels)
-            ) ||
-            (
-                $pos+1 < mb_strlen($name) &&
-                !in_array(mb_substr($name, $pos+1, 1), $vowels)
-            )
+        if (!in_array($key_1n, $this->getVowels()) ||
+            !in_array($key_n1, $this->getVowels())
         ) {
-            if ($pos-1 > 0) {
-                $replacement = mb_substr($name, $pos-1, 1);
-            } else {
-                $replacement = '';
-            }
-            $translated_name = $this->replaceAt($name, 'H', $replacement, $pos);
+            $name = $this->replaceAt($name, 'H', $key_1n, $key_pointer);
+            return true;
         }
-        return $translated_name;
+        return false;
     }
 
     /**
      * Translates the letter W
      *
-     * @param string $name The name to translate
-     * @param integer $pos The position to translate at
-     * @return string
+     * @param string $name A reference to the name to translate
+     * @param string $key_1n The character before the current pointer
+     * @param string $key_n The character at the current pointer
+     * @param integer $key_pointer The position to translate at
+     * @return boolean
      */
-    protected function translateDoubleU($name, $pos)
-    {
-        if (mb_strpos($name, 'W') !== $pos) {
-            return $name;
+    protected function translateDoubleU(
+        &$name,
+        $key_1n,
+        $key_n,
+        $key_pointer
+    ) {
+        if ($key_n != 'W') {
+            return false;
         }
-        $translated_name = $name;
-        $vowels = array('A','E','I','O','U');
-        if (in_array(mb_substr($name, $pos-1, 1), $vowels)) {
-            $translated_name = $this->replaceAt($name, 'W', 'A', $pos);
+        if (in_array($key_1n, $this->getVowels())) {
+            $name = $this->replaceAt($name, 'W', $key_1n, $key_pointer);
+            return true;
         }
-        return $translated_name;
+        return false;
     }
 
     /**
@@ -444,7 +428,7 @@ class NYSIIS
      */
     protected function replaceAt($string, $from, $to, $position)
     {
-        if (mb_strpos($string, $from) !== $position) {
+        if (mb_strpos($string, $from, $position) !== $position) {
             return $string;
         }
         
@@ -452,5 +436,85 @@ class NYSIIS
         $string_after = mb_substr($string, $position + mb_strlen($from));
         
         return $string_before.$to.$string_after;
+    }
+    
+    /**
+     * Returns an array of all vowels
+     * @return array
+     */
+    protected function getVowels()
+    {
+        return array(
+            "A",
+            "E",
+            "I",
+            "O",
+            "U",
+            "À",
+            "È",
+            "Ì",
+            "Ò",
+            "Ù",
+            "Ȁ",
+            "Ȅ",
+            "Ȉ",
+            "Ȍ",
+            "Ȕ",
+            "Á",
+            "É",
+            "Í",
+            "Ó",
+            "Ú",
+            "Ý",
+            "Ő",
+            "Ű",
+            "Â",
+            "Ê",
+            "Î",
+            "Ô",
+            "Û",
+            "Ä",
+            "Ë",
+            "Ï",
+            "Ö",
+            "Ü",
+            "Ã",
+            "Ẽ",
+            "Ĩ",
+            "Õ",
+            "Ũ",
+            "Ą",
+            "Ę",
+            "Į",
+            "Ǫ",
+            "Ų",
+            "Ā",
+            "Ē",
+            "Ī",
+            "Ō",
+            "Ū",
+            "Ă",
+            "Ĕ",
+            "Ĭ",
+            "Ŏ",
+            "Ŭ",
+            "Ǎ",
+            "Ě",
+            "Ǐ",
+            "Ǒ",
+            "Ǔ",
+            "Ȧ",
+            "Ė",
+            "Ȯ",
+            "Ạ",
+            "Ẹ",
+            "Ị",
+            "Ọ",
+            "Ụ",
+            "Ḛ",
+            "Ḭ",
+            "Ṵ",
+            "Ṳ",
+        );
     }
 }

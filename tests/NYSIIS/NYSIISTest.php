@@ -43,6 +43,30 @@ class NYSIISTest extends \PHPUnit_Framework_TestCase
     
     /**
      * @covers cloudPWR\NYSIIS::encode
+     * These tests are taken directly from "Name Search Techniques"
+     */
+    public function testEncodeStandard()
+    {
+        $nysiis = new \cloudPWR\NYSIIS(6);
+        
+        $encode_test = array(
+            "Williams" => "WALAN",
+            "Johnson" => "JANSAN",
+            "Stephens" => "STAFAN",
+            "Schmitt" => "SNAT",
+            "Rodriguez" => "RADRAG"
+            );
+        
+        foreach ($encode_test as $test_name => $expected_encoded) {
+            $this->assertEquals(
+                $expected_encoded,
+                $nysiis->encode($test_name)
+            );
+        }
+    }
+    
+    /**
+     * @covers cloudPWR\NYSIIS::encode
      */
     public function testEncode()
     {
