@@ -1,0 +1,34 @@
+{
+    "name": "cloudPWR/NYSIIS",
+    "description": "A PHP implementation of the New York State Identification and Intelligence System Phonetic Code",
+    "type": "library",
+    "keywords": [
+        "algorithm",
+        "match",
+        "nysiis",
+        "phonetic",
+        "search",
+        "soundex"
+    ],
+    "homepage": "https://github.com/cloudPWR/NYSIIS",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Nathan Horter",
+            "email": "nate@cloudpwr.com",
+            "homepage": "http://www.cloudpwr.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/cloudPWR/NYSIIS/issues"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "cloudPWR\\": "src/"
+        }
+    }
+}
