@@ -182,15 +182,17 @@ class NYSIIS
             "ND" => "D",
         );
         $translated_name = $name;
-        foreach ($last_translate as $from => $to) {
-            $translated_name = $this->replaceAt(
-                $name,
-                $from,
-                $to,
-                mb_strlen($name) - mb_strlen($from)
-            );
-            if ($name !== $translated_name) {
-                break;
+        if (mb_strlen($translated_name) > 1) {
+            foreach ($last_translate as $from => $to) {
+                $translated_name = $this->replaceAt(
+                    $name,
+                    $from,
+                    $to,
+                    mb_strlen($name) - mb_strlen($from)
+                );
+                if ($name !== $translated_name) {
+                    break;
+                }
             }
         }
         return $translated_name;
@@ -386,15 +388,17 @@ class NYSIIS
             "AY" => "Y",
         );
         $translated_name = $name;
-        foreach ($last_translate as $from => $to) {
-            $translated_name = $this->replaceAt(
-                $name,
-                $from,
-                $to,
-                mb_strlen($name) - mb_strlen($from)
-            );
-            if ($name !== $translated_name) {
-                break;
+        if (mb_strlen($translated_name) > 1) {
+            foreach ($last_translate as $from => $to) {
+                $translated_name = $this->replaceAt(
+                    $name,
+                    $from,
+                    $to,
+                    mb_strlen($name) - mb_strlen($from)
+                );
+                if ($name !== $translated_name) {
+                    break;
+                }
             }
         }
         return $translated_name;
