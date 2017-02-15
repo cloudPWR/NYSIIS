@@ -180,4 +180,31 @@ class NYSIISTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
+    
+    /**
+     * @covers cloudPWR\NYSIIS::encode
+     */
+    public function testShortNames()
+    {
+        $nysiis = new \cloudPWR\NYSIIS();
+        
+        $encode_test = array(
+            "e" => "E",
+            "t" => "T",
+            "a" => "",
+            "o" => "O",
+            "Bo" => "B",
+            "Du" => "D",
+            "Ek" => "EC",
+            "Hu" => "H",
+            "Yu" => "Y",
+        );
+        
+        foreach ($encode_test as $test_name => $expected_encoded) {
+            $this->assertEquals(
+                $expected_encoded,
+                $nysiis->encode($test_name)
+            );
+        }
+    }
 }

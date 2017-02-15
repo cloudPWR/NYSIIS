@@ -187,7 +187,7 @@ class NYSIIS
                 $name,
                 $from,
                 $to,
-                mb_strlen($name) - mb_strlen($from)
+                $this->getPosition($name, $from)
             );
             if ($name !== $translated_name) {
                 break;
@@ -391,7 +391,7 @@ class NYSIIS
                 $name,
                 $from,
                 $to,
-                mb_strlen($name) - mb_strlen($from)
+                $this->getPosition($name, $from)
             );
             if ($name !== $translated_name) {
                 break;
@@ -516,5 +516,20 @@ class NYSIIS
             "Ṵ",
             "Ṳ",
         );
+    }
+    
+    /**
+     * Get the position to start looking for the from string
+     * @param string $name The name to translate
+     * @param string $from The from string we are translating
+     * @return integer
+     */
+    protected function getPosition($name, $from)
+    {
+        $position = mb_strlen($name) - mb_strlen($from);
+        if ($position < 0 || $position > mb_strlen($name)) {
+            $position = mb_strlen($name);
+        }
+        return $position;
     }
 }
