@@ -13,14 +13,14 @@ class NYSIIS
 {
     /**
      * The maximum length of the encoded output to return.
-     * @var integer
+     * @var int
      */
     protected $max_output_length;
 
     /**
      * Creates a new NYSIIS object
      *
-     * @param integer $max_output_length The maximum length of the encoded
+     * @param int $max_output_length The maximum length of the encoded
      *  output. Zero or any negative value indicates unlimited length. The
      *  originial NYSIIS algorithm truncated to 6 characters.
      */
@@ -31,7 +31,7 @@ class NYSIIS
                 'cloudPWR\\NYSIIS was created with an invalid max_output_length.'
             );
         }
-        $this->max_output_length = (integer)$max_output_length;
+        $this->max_output_length = (int)$max_output_length;
     }
 
     /**
@@ -202,8 +202,8 @@ class NYSIIS
      * @param string $name A reference to the name to translate
      * @param string $key_n The character at the current pointer
      * @param string $key_n1 The character after the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateVowels(
         &$name,
@@ -230,8 +230,8 @@ class NYSIIS
      *
      * @param string $name A reference to the name to translate
      * @param string $key_n The character at the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateSuperficialLetters(
         &$name,
@@ -258,8 +258,8 @@ class NYSIIS
      * @param string $name A reference to the name to translate
      * @param string $key_n The character at the current pointer
      * @param string $key_n1 The character after the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateKay(
         &$name,
@@ -284,8 +284,8 @@ class NYSIIS
      * @param string $name A reference to the name to translate
      * @param string $key_n The character at the current pointer
      * @param string $key_n1 The character after the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateHomophones(
         &$name,
@@ -312,8 +312,8 @@ class NYSIIS
      * @param string $key_1n The character before the current pointer
      * @param string $key_n The character at the current pointer
      * @param string $key_n1 The character after the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateAitch(
         &$name,
@@ -340,8 +340,8 @@ class NYSIIS
      * @param string $name A reference to the name to translate
      * @param string $key_1n The character before the current pointer
      * @param string $key_n The character at the current pointer
-     * @param integer $key_pointer The position to translate at
-     * @return boolean
+     * @param int $key_pointer The position to translate at
+     * @return bool
      */
     protected function translateDoubleU(
         &$name,
@@ -422,7 +422,7 @@ class NYSIIS
      * @param string $string The string to replace values in.
      * @param string $from The value to search for in the string
      * @param string $to The value with which to replace the found from string
-     * @param integer $position The charachter position of to look for the from
+     * @param int $position The charachter position of to look for the from
      *  string
      * @return string
      */
@@ -522,7 +522,7 @@ class NYSIIS
      * Get the position to start looking for the from string
      * @param string $name The name to translate
      * @param string $from The from string we are translating
-     * @return integer
+     * @return int
      */
     protected function getPosition($name, $from)
     {
